@@ -1,4 +1,5 @@
 import json
+import numpy as np
 
 def filename_with_extension(filename, extension):
     extension = "." + extension if extension[0] != "." else extension
@@ -42,3 +43,59 @@ def show_scatterplot(priData, altData=None, alpha=0.1):
     if altData is not None:
         plt.scatter(altData[0], altData[1], c="r", marker=".", alpha=alpha, lw=0, s=300)
     plt.show()
+
+"""
+Returns a randomly scrambled copy of a set of training data and its corresponding labels.
+"""
+def scramble_data_and_labels(data, labels):
+    indices = np.array([i for i in xrange(len(labels))], dtype=np.int)
+    np.random.shuffle(indices)
+    return data[indices], labels[indices]
+
+"""
+Runs the given function, wrapping execution of the function with timing outputs.
+"""
+def run_and_time(message, function, messageLimit=70):
+    print message, " " * (messageLimit - len(message)),
+    sys.stdout.flush()
+    currentTime = time()
+    result = function()
+    print "    done. (%.2f seconds)" % (time() - currentTime)
+    return result
+
+"""
+Converts raw data into a dictionary mapping each classification to an array containing
+image data for that classification.
+"""
+def data_by_class(data, labels):
+    dataByClass = {}
+    for label in labels:
+        if int(label) not in dataByClass:
+            dataByClass[int(label)] = data[np.where(labels == label)[0]]
+    return dataByClass
+
+"""
+Given training data by classes, a total sample size and the number of partitions k to
+divide the data into, returns a list of k (training data, classification) tuples.
+"""
+def collect_data_for_kfcv_training(data, labels, k=8):
+    totalSize = len(data)
+    data, labels = scramble_data_and_labels(data, labels)
+    partitionSize = int(round(totalSize / float(k)))
+    result = []
+    for offset in xrange(0, totalSize, partitionSize):
+        end = min(offset + partitionSize, totalSize)
+        if offset is end:
+            continue
+        result.append((data[offset:end], labels[offset:end]))
+    return result
+
+"""
+Computes the fraction of entries in the given arrays that match.
+"""
+def prediction_accuracy(predicted, expected):
+    correctEvaluationCount = 0
+    for prediction, expectation in zip(predicted, expected):
+        if prediction == expectation:
+            correctEvaluationCount += 1
+    return float(correctEvaluationCount) / len(predicted)

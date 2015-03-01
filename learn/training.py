@@ -39,3 +39,18 @@ class LogisticClassifier(object):
     """
     def feature_indices_by_importance(self):
         return np.argsort(coef)[::-1]
+
+def kfcv_accuracy(allData, allLabels, k=3):
+    dataset = collect_data_for_kfcv_training(allData, allLabels, k=k)
+    accuracies = np.zeros(len(dataset))
+    for index, (data, labels) in enumerate(dataset):
+        trainingData = np.vstack([dataset[i][0] for i in xrange(len(dataset)) if i != index])
+        trainingLabels = np.hstack([dataset[i][1] for i in xrange(len(dataset)) if i != index])
+        cls = LogisticClassifier()
+        cls.train(trainingData, trainingLabels)
+        numCorrectPredictions = 0
+        validationData, expectedLabels = dataset[index]
+        predictedLabels = np.array([(1 if cls.predict(x) > 0.5 else 0) for x in validationData])
+        accuracies[index] = prediction_accuracy(predictedLabels, expectedLabels)
+    accuracies = np.array(accuracies)
+    return accuracies.mean(), accuracies

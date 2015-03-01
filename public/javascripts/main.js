@@ -1,6 +1,8 @@
 
 function getMatchData(summonerName, callback) {
-
+    $.get("http://localhost:3000/matches/" + name, function(responseText) {
+        callback(JSON.parse(responseText));
+    });
 }
 
 function sigma(x) {
@@ -20,6 +22,7 @@ function dot(u, v) {
     }
     return res;
 }
+
 /**
  * Sends a GET request to the server for a particular classifier, specified by a coefficient
  * vector and an offset value.
