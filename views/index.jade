@@ -4,7 +4,27 @@ block content
   .jumbotron
     .container-fluid
       .row-fluid
-        .span7
-          h1.center A League of Legends Helper
-    
+        .col-md-12
+          h1.text-center A League of Legends Helper
+      .row-fluid.margin-top-md
+        .col-md-3
+        .col-md-6
+          .input-group
+            input.form-control(type="text")
+            .input-group-btn
+              .btn-group
+                button.btn.btn-default.dropdown-toggle(type="button", data-toggle="dropdown") Region #[span.caret]
+                ul.dropdown-menu.dropdown-menu-right(role="menu")
+                  li #[a(href="#") NA]
+                  li #[a(href="#") KR]
+              .btn-group
+                button.btn.btn-default.dropdown-toggle(type="button", data-toggle="dropdown") Role #[span.caret]
+                ul.dropdown-menu.dropdown-menu-right(role="menu")
+                  li #[a(href="#") Top]
+                  li #[a(href="#") Mid]
+                  li #[a(href="#") Jungle]
+                  li #[a(href="#") Carry]
+                  li #[a(href="#") Support]
+              button.btn.btn-primary(type="button") Search 
+        .col-md-3 
 
