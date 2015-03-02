@@ -35,3 +35,5 @@ node_modules
 
 # Python
 *.pyc
+
+challenger_matches.json

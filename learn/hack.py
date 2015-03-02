@@ -79,10 +79,10 @@ class MatchDataCollection(object):
     def featurize(self, role):
         # X is the list of features for a player of the given role and lane
         # For N games, there are at most 2N vectors in X, as there should be at most one player of a role and lane on each team
-        # Y is the corresponding labels: wether that player win or lost the game 
+        # Y is the corresponding labels: wether that player win or lost the game
         X = []
         Y = []
-        
+
         # Break up the role into role and land that are required for accessing match data.
         lane, role = roleToLaneAndRole[role]
 
@@ -92,7 +92,7 @@ class MatchDataCollection(object):
 
         for featureName, extractor in featureExtractors.items():
             print "Extracting feature '%s'" % featureName
-            stats = np.hstack([extractor(self, winner=True, role=role, lane=lane), 
+            stats = np.hstack([extractor(self, winner=True, role=role, lane=lane),
                 extractor(self, winner=False, role=role, lane=lane)])
             stats = featureNormalizers[featureName](stats)
             X.append(stats)
@@ -104,7 +104,7 @@ class MatchDataCollection(object):
         return X, Y
 
 # featureExtractors[featureName] is a function that takes in a MatchDataCollection, winner, role and
-# lane to return a tuple of two lists (win and loss) of numbers, respresenting observations for that feature. 
+# lane to return a tuple of two lists (win and loss) of numbers, respresenting observations for that feature.
 featureExtractors = {}
 
 # featureNormalizers[featureName] is a function that takes in a vector of observations about a
@@ -131,24 +131,24 @@ def timeline_data_getter(name, timeline):
         return m.data_per_participant(keyPath, winner=winner, role=role, lane=lane)
     return foo
 
-statsFeatures = ['assists', 'champLevel', 'deaths', 'doubleKills', 
-                'firstBloodAssist', 'firstBloodKill', 'firstInhibitorAssist', 'firstInhibitorKill', 
-                'firstTowerAssist', 'firstTowerKill', 'goldEarned', 'goldSpent', 'inhibitorKills', 
-                #'item0', 'item1', 'item2', 'item3', 'item4', 'item5', 'item6', 
+statsFeatures = ['assists', 'champLevel', 'deaths', 'doubleKills',
+                'firstBloodAssist', 'firstBloodKill', 'firstInhibitorAssist', 'firstInhibitorKill',
+                'firstTowerAssist', 'firstTowerKill', 'goldEarned', 'goldSpent', 'inhibitorKills',
+                #'item0', 'item1', 'item2', 'item3', 'item4', 'item5', 'item6',
                 'killingSprees', 'kills',
                 'largestCriticalStrike', 'largestKillingSpree', 'largestMultiKill', 'magicDamageDealt',
-                'magicDamageDealtToChampions', 'magicDamageTaken', 'minionsKilled', 
-                'neutralMinionsKilled', 'neutralMinionsKilledEnemyJungle', 
-                'neutralMinionsKilledTeamJungle', 'pentaKills', 
-                'physicalDamageDealt', 'physicalDamageDealtToChampions', 'physicalDamageTaken', 
-                'quadraKills', 'sightWardsBoughtInGame', 'totalDamageDealt', 
-                'totalDamageDealtToChampions', 'totalDamageTaken', 'totalHeal', 
-                'totalTimeCrowdControlDealt', 'totalUnitsHealed', 'towerKills', 
-                'tripleKills', 'trueDamageDealt', 'trueDamageDealtToChampions', 'trueDamageTaken', 
+                'magicDamageDealtToChampions', 'magicDamageTaken', 'minionsKilled',
+                'neutralMinionsKilled', 'neutralMinionsKilledEnemyJungle',
+                'neutralMinionsKilledTeamJungle', 'pentaKills',
+                'physicalDamageDealt', 'physicalDamageDealtToChampions', 'physicalDamageTaken',
+                'quadraKills', 'sightWardsBoughtInGame', 'totalDamageDealt',
+                'totalDamageDealtToChampions', 'totalDamageTaken', 'totalHeal',
+                'totalTimeCrowdControlDealt', 'totalUnitsHealed', 'towerKills',
+                'tripleKills', 'trueDamageDealt', 'trueDamageDealtToChampions', 'trueDamageTaken',
                 'unrealKills', 'visionWardsBoughtInGame', 'wardsKilled', 'wardsPlaced'
                 ]
 
-timelineFeatures = ['creepsPerMinDeltas', 'csDiffPerMinDeltas', 'damageTakenDiffPerMinDeltas', 
+timelineFeatures = ['creepsPerMinDeltas', 'csDiffPerMinDeltas', 'damageTakenDiffPerMinDeltas',
                     'damageTakenPerMinDeltas', 'goldPerMinDeltas', 'xpDiffPerMinDeltas',
                     'xpPerMinDeltas'
                     ]
@@ -176,7 +176,7 @@ spellNameToId = {
                     "spell_clarity" : 13,
                     "spell_ignite"  : 14,
                     "spell_garrison": 17,
-                    "spell_barrier" : 21 
+                    "spell_barrier" : 21
                 }
 def spell_feature_getter(spellName):
     def foo(m, winner, role, lane):
@@ -201,13 +201,7 @@ for f in featureExtractors:
         featureNormalizers[f] = normalize_feature
 
 if __name__ == "__main__":
-    # startTime = time.time()
-    # print "Reading matches data..."
-    # with open("challenger_matches.json") as json_file:
-    #     data = json.load(json_file)
-    #     m = MatchDataCollection(dict(data.items()[:10]))
-    #     print "    Took %.2f second" % (time.time() - startTime)
-    # x, y = m.featurize(role="MID")
-    print
-
-
+    with open("challenger_matches.json") as json_file:
+        data = json.load(json_file)
+        m = MatchDataCollection(dict(data.items()[:10]))
+    x, y = m.featurize(role="MID")
