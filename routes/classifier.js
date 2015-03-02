@@ -4,9 +4,9 @@ var path = require("path");
 var fs = require("fs");
 
 /* GET trained classifier parameters. */
-router.get("/:name([A-Za-z_\\-]+)", function(req, res) {
-    classifierName = req["params"]["name"];
-    fs.readFile("learn/classifiers/" + classifierName + ".json", function(err, data) {
+router.get("/:role([A-Za-z_\\-]+)", function(req, res) {
+    role = req["params"]["role"];
+    fs.readFile("learn/classifiers/" + role + "_classifier.json", function(err, data) {
         if (err) {
             res.end(JSON.stringify(err));
         } else {

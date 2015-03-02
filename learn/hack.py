@@ -203,5 +203,13 @@ for f in featureExtractors:
 
 if __name__ == "__main__":
     matchData = MatchDataCollection(load_json_as_object("learn/challenger_matches"))
-    data, labels = matchData.featurize("MID")
-    mean, accuracies = kfcv_accuracy(data, labels)
+    for role in ["BOT", "SUPPORT", "MID", "JUNGLE", "TOP"]:
+        print "Training classifier for role: %s" % role
+        data, labels = matchData.featurize(role)
+        mean, accuracies = kfcv_accuracy(data, labels)
+        print "  Accuracy: %.4f" % mean
+        cls = LogisticClassifier()
+        cls.train(data, labels)
+        classifierName = "%s_classifier.json" % role.lower()
+        cls.save(classifierName)
+        print "  Saved classifier as %s" % classifierName
