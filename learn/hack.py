@@ -104,7 +104,7 @@ class MatchDataCollection(object):
         return X, Y
 
 # featureExtractors[featureName] is a function that takes in a MatchDataCollection, winner, role and
-# role to return a tuple of two lists (win and loss) of numbers, respresenting observations for that feature. 
+# lane to return a tuple of two lists (win and loss) of numbers, respresenting observations for that feature. 
 featureExtractors = {}
 
 # featureNormalizers[featureName] is a function that takes in a vector of observations about a
@@ -117,7 +117,7 @@ def normalize_feature(v):
     if type(v[0]) == bool or max(v) == 0:
         return v
     else:
-        return np.array(v, dtype=np.float32) / max(v)
+        return np.array(v, dtype=np.float32) / np.max(np.abs(v))
 
 def stats_data_getter(name):
     keyPath = "stats/" + name
@@ -208,5 +208,6 @@ if __name__ == "__main__":
     #     m = MatchDataCollection(dict(data.items()[:10]))
     #     print "    Took %.2f second" % (time.time() - startTime)
     # x, y = m.featurize(role="MID")
+    print
 
 
