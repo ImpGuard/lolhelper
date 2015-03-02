@@ -1,7 +1,6 @@
 var express = require("express");
 var router = express.Router();
 var path = require("path");
-var childProcess = require("child_process");
 var fs = require("fs");
 
 /* GET trained classifier parameters. */

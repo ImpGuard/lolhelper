@@ -9,6 +9,7 @@ var expressLess = require('express-less');
 var routes = require('./routes/index');
 var classifier = require('./routes/classifier');
 var matches = require('./routes/matches');
+var icon = require('./routes/icon');
 
 var app = express();
 
@@ -28,6 +29,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use('/', routes);
 app.use('/classifier', classifier);
 app.use('/matches', matches);
+app.use('/icon', icon);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
