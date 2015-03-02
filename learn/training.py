@@ -7,17 +7,20 @@ class LogisticClassifier(object):
         assert not ((coef is None) ^ (offset is None)), "Exactly one of coefficients or offset is None."
         self.coef = coef
         self.offset = offset
+        self.maxima = None
 
-    def train(self, data, labels):
+    def train(self, data, labels, maxima):
         if self.coef is None and self.offset is None:
             model = LogisticRegression()
             model.fit(data, labels)
             self.coef = model.coef_[0]
             self.offset = model.intercept_[0]
+            self.maxima = maxima
 
     def save(self, filename="classifier.json"):
         save_object_as_json(filename, {
             "coef": [c for c in self.coef],
+            "maxima": [str(m) for m in self.maxima],
             "offset": self.offset
         })
 
@@ -25,6 +28,7 @@ class LogisticClassifier(object):
         obj = load_json_as_object(filename)
         self.coef = np.array(obj["coef"])
         self.offset = obj["offset"]
+        self.maxima = obj["maxima"]
 
     """
     Returns the probability of winning given a feature vector x.
@@ -48,7 +52,7 @@ def kfcv_accuracy(allData, allLabels, k=10):
             trainingData = np.vstack([dataset[i][0] for i in xrange(len(dataset)) if i != index])
             trainingLabels = np.hstack([dataset[i][1] for i in xrange(len(dataset)) if i != index])
             cls = LogisticClassifier()
-            cls.train(trainingData, trainingLabels)
+            cls.train(trainingData, trainingLabels, None)
             numCorrectPredictions = 0
             validationData, expectedLabels = dataset[index]
             predictedLabels = np.array([(1 if cls.predict(x) > 0.5 else 0) for x in validationData])

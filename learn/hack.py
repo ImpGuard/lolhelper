@@ -76,12 +76,13 @@ class MatchDataCollection(object):
         pprint(self.matches[matches.keys()[index]])
 
     # role should be "BOT"/"SUPPORT"/"MID"/"JUNGLE"/"TOP"
-    def featurize(self, role, printLog=False):
+    def featurize(self, role, printLog=True):
         # X is the list of features for a player of the given role and lane
         # For N games, there are at most 2N vectors in X, as there should be at most one player of a role and lane on each team
         # Y is the corresponding labels: wether that player win or lost the game
         X = []
         Y = []
+        featureMaxima = []
 
         # Break up the role into role and land that are required for accessing match data.
         lane, role = roleToLaneAndRole[role]
@@ -90,23 +91,45 @@ class MatchDataCollection(object):
         Y += [1] * wins
         Y += [0] * losses
 
-        for featureName, extractor in featureExtractors.items():
+        for featureName, extractor in sorted(statFeatureExtractors.items()):
             if printLog:
-                print "Extracting feature "%s"" % featureName
+                print "Extracting stat feature \"%s\"" % featureName
             stats = np.hstack([extractor(self, winner=True, role=role, lane=lane),
                 extractor(self, winner=False, role=role, lane=lane)])
-            stats = featureNormalizers[featureName](stats)
+            stats, maximum = featureNormalizers[featureName](stats)
             X.append(stats)
+            featureMaxima.append(maximum)
+
+        for featureName, extractor in sorted(timelineFeatureExtractors.items()):
+            if printLog:
+                print "Extracting timeline feature \"%s\"" % featureName
+            stats = np.hstack([extractor(self, winner=True, role=role, lane=lane),
+                extractor(self, winner=False, role=role, lane=lane)])
+            stats, maximum = featureNormalizers[featureName](stats)
+            X.append(stats)
+            featureMaxima.append(maximum)
+
+        for featureName, extractor in sorted(spellFeatureExtractors.items()):
+            if printLog:
+                print "Extracting spell feature \"%s\"" % featureName
+            stats = np.hstack([extractor(self, winner=True, role=role, lane=lane),
+                extractor(self, winner=False, role=role, lane=lane)])
+            stats, maximum = featureNormalizers[featureName](stats)
+            X.append(stats)
+            featureMaxima.append(maximum)
 
         X = np.array(X, dtype=np.float32)
         X = X.T             # Transpose so that each row correspondes to features of one player in one game.
         Y = np.array(Y)
+        featureMaxima = np.array(featureMaxima, dtype=np.float32)
         assert len(X) == len(Y), "Number of observations should match that of labels."
-        return X, Y
+        return X, Y, featureMaxima
 
 # featureExtractors[featureName] is a function that takes in a MatchDataCollection, winner, role and
 # lane to return a tuple of two lists (win and loss) of numbers, respresenting observations for that feature.
-featureExtractors = {}
+statFeatureExtractors = {}
+timelineFeatureExtractors = {}
+spellFeatureExtractors = {}
 
 # featureNormalizers[featureName] is a function that takes in a vector of observations about a
 # feature, and then return the normalized values.
@@ -116,9 +139,10 @@ featureNormalizers = {}
 def normalize_feature(v):
     # No need to normalize if everything is already between 0 and 1 (for bool) or all 0"s (for max = 0)
     if type(v[0]) == bool or max(v) == 0:
-        return v
+        return v, 0
     else:
-        return np.array(v, dtype=np.float32) / np.max(np.abs(v))
+        maximum = np.max(np.abs(v))
+        return np.array(v, dtype=np.float32) / maximum, maximum
 
 def stats_data_getter(name):
     keyPath = "stats/" + name
@@ -156,12 +180,12 @@ timelineFeatures = ["creepsPerMinDeltas", "csDiffPerMinDeltas", "damageTakenDiff
 
 # Defining the extractors and normalizers
 for f in statsFeatures:
-    featureExtractors[f] = stats_data_getter(f)
+    statFeatureExtractors[f] = stats_data_getter(f)
 
 timelines = ["tenToTwenty", "thirtyToEnd", "twentyToThirty", "zeroToTen"]
 for f in timelineFeatures:
     for timeline in timelines:
-        featureExtractors[f + "_" + timeline] = timeline_data_getter(f, timeline)
+        timelineFeatureExtractors[f + "_" + timeline] = timeline_data_getter(f, timeline)
 
 # Misc. features
 spellNameToId = {
@@ -193,23 +217,34 @@ def spell_feature_getter(spellName):
                 x.append(False)
         return np.array(x)
     return foo
-for f in spellNameToId:
-     featureExtractors[f] = spell_feature_getter(f)
 
-for f in featureExtractors:
+for f in spellNameToId:
+     spellFeatureExtractors[f] = spell_feature_getter(f)
+
+for f in statFeatureExtractors:
+    # If a feature doesn"t have a normalizer, jsut use the default
+    if f not in featureNormalizers:
+        featureNormalizers[f] = normalize_feature
+
+for f in timelineFeatureExtractors:
+    # If a feature doesn"t have a normalizer, jsut use the default
+    if f not in featureNormalizers:
+        featureNormalizers[f] = normalize_feature
+
+for f in spellFeatureExtractors:
     # If a feature doesn"t have a normalizer, jsut use the default
     if f not in featureNormalizers:
         featureNormalizers[f] = normalize_feature
 
 if __name__ == "__main__":
-    matchData = MatchDataCollection(load_json_as_object("learn/challenger_matches"))
+    matchData = MatchDataCollection(load_json_as_object("challenger_matches"))
     for role in ["BOT", "SUPPORT", "MID", "JUNGLE", "TOP"]:
         print "Training classifier for role: %s" % role
-        data, labels = matchData.featurize(role)
+        data, labels, maxima = matchData.featurize(role)
         mean, accuracies = kfcv_accuracy(data, labels)
         print "  Accuracy: %.4f" % mean
         cls = LogisticClassifier()
-        cls.train(data, labels)
+        cls.train(data, labels, maxima)
         classifierName = "%s_classifier.json" % role.lower()
         cls.save(classifierName)
         print "  Saved classifier as %s" % classifierName

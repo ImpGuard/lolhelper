@@ -78,7 +78,6 @@ $(function() {
     //     dataPerParticipant()
     // }
 
-
     function getUrlParameter(param) {
         var pageURL = window.location.search.substring(1);
         var urlVariables = pageURL.split("&");
@@ -144,12 +143,16 @@ $(function() {
         return res;
     }
 
-    function LogisticClassifier(coef, offset) {
+    function LogisticClassifier(coef, offset, maxima) {
         this.coef = coef;
         this.offset = offset;
+        this.maxima = maxima.map(function(element) {
+            return Number(element);
+        });
     }
 
     LogisticClassifier.prototype.predict = function(x) {
+        x = x.map(function(element, index) { return element / this.maxima[index]; })
         return sigma(dot(x, this.coef) + this.offset);
     }
 
