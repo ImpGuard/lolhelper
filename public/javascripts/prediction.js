@@ -1,45 +1,41 @@
 $(function() {
-    function dataPerParticipant(matches, userName, keyPath, winner, role, lane) {
+    function dataPerParticipant(matches, userName, keyPath, role, lane) {
         if (role != null)
-            var role = role.toLowerCase()
-        var lane = lane.toLowerCase()
-        var keyPath = keyPath.split("/")
+            var role = role.toLowerCase();
+
+        var lane = lane.toLowerCase();
+        var keyPath = keyPath.split("/");
         var filter_participant = function(participant) {
-                if (participant["stats"]["winner"] == winner
-                    && (role == null || participant["timeline"]["role"].toLowerCase().indexOf(role) != -1)
-                    && participant["timeline"]["lane"].toLowerCase().indexOf(lane) != -1)
-                    return true
-                else
-                    return false
-            }
-        var data = []
+            return ((role == null || participant["timeline"]["role"].toLowerCase().indexOf(role) != -1)
+                && participant["timeline"]["lane"].toLowerCase().indexOf(lane) != -1);
+        }
+        var data = [];
         matches.forEach(function(match) {
-            var pids = match["participants"]
-            var pid
+            var pids = match["participantIdentities"]
+            var pid;
             pids.forEach(function(participantIdentity) {
-                if (participantIdentity["summonerName"] == userName) {
-                    pid = participantIdentity["participantId"]
+                if (participantIdentity.player["summonerName"] == userName) {
+                    pid = participantIdentity["participantId"];
                 }
-            })
+            });
             participants = match["participants"]
-            var user
+            var user;
             participants.forEach(function(p) {
                 if (p["participantId"] == pid)
-                    user = p
-            })
-
-            data.push(dataAtKeypath(user, keyPath))
-        })
-        return data
+                    user = p;
+            });
+            data.push(dataAtKeypath(user, keyPath));
+        });
+        return data;
     }
 
     function dataAtKeypath(data, keyPath) {
         keyPath.forEach(function(key) {
             if (!(key in data))
-                return 0.0
-            data = data[key]
-        })
-        return data
+                return 0.0;
+            data = data[key];
+        });
+        return data;
     }
 
     roleToLaneAndRole = {
@@ -48,33 +44,39 @@ $(function() {
                             "MID":          ["MID", null],
                             "JUNGLE":       ["JUNGLE", null],
                             "TOP":          ["TOP", null]
-                        }
+                        };
 
-   /* function featuresFromMatches(matches, userName, role) {
-        var X = []
-        var Y = []
-        
-        var res = roleToLaneAndRole[role]
-        var lane = res[0]
-        var role = res[1]
 
-        wins, losses = self.win_loss(lane=lane, role=role)
-        Y += [1] * wins
-        Y += [0] * losses
+    var statsFeatures = ["assists", "champLevel", "deaths", "doubleKills", "firstBloodAssist", "firstBloodKill", "firstInhibitorAssist", "firstInhibitorKill", "firstTowerAssist", "firstTowerKill", "goldEarned", "goldSpent", "inhibitorKills", "killingSprees", "kills", "largestCriticalStrike", "largestKillingSpree", "largestMultiKill", "magicDamageDealt", "magicDamageDealtToChampions", "magicDamageTaken", "minionsKilled", "neutralMinionsKilled", "neutralMinionsKilledEnemyJungle", "neutralMinionsKilledTeamJungle", "pentaKills", "physicalDamageDealt", "physicalDamageDealtToChampions", "physicalDamageTaken", "quadraKills", "sightWardsBoughtInGame", "totalDamageDealt", "totalDamageDealtToChampions", "totalDamageTaken", "totalHeal", "totalTimeCrowdControlDealt", "totalUnitsHealed", "towerKills", "tripleKills", "trueDamageDealt", "trueDamageDealtToChampions", "trueDamageTaken", "unrealKills", "visionWardsBoughtInGame", "wardsKilled", "wardsPlaced"];
+    var timelineFeatures = ["creepsPerMinDeltas", "csDiffPerMinDeltas", "damageTakenDiffPerMinDeltas", "damageTakenPerMinDeltas", "goldPerMinDeltas", "xpDiffPerMinDeltas", "xpPerMinDeltas"];
+    var spellNameToId = {
+        "spell_cleanse" : 1,
+        "spell_clairv"  : 2,
+        "spell_exhaust" : 3,
+        "spell_flash"   : 4,
+        "spell_ghost"   : 6,
+        "spell_heal"    : 7,
+        "spell_revive"  : 10,
+        "spell_smite"   : 11,
+        "spell_teleport": 12,
+        "spell_clarity" : 13,
+        "spell_ignite"  : 14,
+        "spell_garrison": 17,
+        "spell_barrier" : 21
+    };
 
-        for featureName, extractor in featureExtractors.items():
-            print "Extracting feature '%s'" % featureName
-            stats = np.hstack([extractor(self, winner=True, role=role, lane=lane), 
-                extractor(self, winner=False, role=role, lane=lane)])
-            stats = featureNormalizers[featureName](stats)
-            X.append(stats)
+    // function featuresFromMatches(matches, username, role) {
+    //     var featureVectors = [];
+    //     var laneAndRole = roleToLaneAndRole[role]
+    //     statsFeatures.forEach(function(featureName) {
+    //         featureValues = []
+    //         dataPerParticipant(matches, username, "stats/" + featureName, laneAndRole[1], laneAndRole[0]).forEach(function(data) {
 
-        X = np.array(X, dtype=np.float32)
-        X = X.T             # Transpose so that each row correspondes to features of one player in one game.
-        Y = np.array(Y)
-        assert len(X) == len(Y), "Number of observations should match that of labels."
-        return X, Y
-    }*/
+    //             featureVectors.push(data);
+    //         });
+    //     });
+    //     dataPerParticipant()
+    // }
 
 
     function getUrlParameter(param) {
@@ -154,13 +156,14 @@ $(function() {
     window.getClassifier = getClassifier;
     window.getMatchData = getMatchData;
     window.getProfilePictureURL = getProfilePictureURL;
+    window.dataPerParticipant = dataPerParticipant;
 
     var username = getUrlParameter("username");
     var role = getUrlParameter("role");
     getClassifier(role, function(cls) {
-        getMatchData(username, function(matches) {
+        getMatchData(username, function(matches_) {
             // var featureVectors = featuresFromMatches(matches, username, role);
-            console.log(matches);
+            matches = matches_;
         });
     });
 });
