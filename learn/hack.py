@@ -92,7 +92,7 @@ class MatchDataCollection(object):
 
         for featureName, extractor in featureExtractors.items():
             if printLog:
-                print "Extracting feature '%s'" % featureName
+                print "Extracting feature "%s"" % featureName
             stats = np.hstack([extractor(self, winner=True, role=role, lane=lane),
                 extractor(self, winner=False, role=role, lane=lane)])
             stats = featureNormalizers[featureName](stats)
@@ -114,7 +114,7 @@ featureNormalizers = {}
 
 # Normalize a vector to have values between 0 and 1.
 def normalize_feature(v):
-    # No need to normalize if everything is already between 0 and 1 (for bool) or all 0's (for max = 0)
+    # No need to normalize if everything is already between 0 and 1 (for bool) or all 0"s (for max = 0)
     if type(v[0]) == bool or max(v) == 0:
         return v
     else:
@@ -132,26 +132,26 @@ def timeline_data_getter(name, timeline):
         return m.data_per_participant(keyPath, winner=winner, role=role, lane=lane)
     return foo
 
-statsFeatures = ['assists', 'champLevel', 'deaths', 'doubleKills',
-                'firstBloodAssist', 'firstBloodKill', 'firstInhibitorAssist', 'firstInhibitorKill',
-                'firstTowerAssist', 'firstTowerKill', 'goldEarned', 'goldSpent', 'inhibitorKills',
-                #'item0', 'item1', 'item2', 'item3', 'item4', 'item5', 'item6',
-                'killingSprees', 'kills',
-                'largestCriticalStrike', 'largestKillingSpree', 'largestMultiKill', 'magicDamageDealt',
-                'magicDamageDealtToChampions', 'magicDamageTaken', 'minionsKilled',
-                'neutralMinionsKilled', 'neutralMinionsKilledEnemyJungle',
-                'neutralMinionsKilledTeamJungle', 'pentaKills',
-                'physicalDamageDealt', 'physicalDamageDealtToChampions', 'physicalDamageTaken',
-                'quadraKills', 'sightWardsBoughtInGame', 'totalDamageDealt',
-                'totalDamageDealtToChampions', 'totalDamageTaken', 'totalHeal',
-                'totalTimeCrowdControlDealt', 'totalUnitsHealed', 'towerKills',
-                'tripleKills', 'trueDamageDealt', 'trueDamageDealtToChampions', 'trueDamageTaken',
-                'unrealKills', 'visionWardsBoughtInGame', 'wardsKilled', 'wardsPlaced'
+statsFeatures = ["assists", "champLevel", "deaths", "doubleKills",
+                "firstBloodAssist", "firstBloodKill", "firstInhibitorAssist", "firstInhibitorKill",
+                "firstTowerAssist", "firstTowerKill", "goldEarned", "goldSpent", "inhibitorKills",
+                #"item0", "item1", "item2", "item3", "item4", "item5", "item6",
+                "killingSprees", "kills",
+                "largestCriticalStrike", "largestKillingSpree", "largestMultiKill", "magicDamageDealt",
+                "magicDamageDealtToChampions", "magicDamageTaken", "minionsKilled",
+                "neutralMinionsKilled", "neutralMinionsKilledEnemyJungle",
+                "neutralMinionsKilledTeamJungle", "pentaKills",
+                "physicalDamageDealt", "physicalDamageDealtToChampions", "physicalDamageTaken",
+                "quadraKills", "sightWardsBoughtInGame", "totalDamageDealt",
+                "totalDamageDealtToChampions", "totalDamageTaken", "totalHeal",
+                "totalTimeCrowdControlDealt", "totalUnitsHealed", "towerKills",
+                "tripleKills", "trueDamageDealt", "trueDamageDealtToChampions", "trueDamageTaken",
+                "unrealKills", "visionWardsBoughtInGame", "wardsKilled", "wardsPlaced"
                 ]
 
-timelineFeatures = ['creepsPerMinDeltas', 'csDiffPerMinDeltas', 'damageTakenDiffPerMinDeltas',
-                    'damageTakenPerMinDeltas', 'goldPerMinDeltas', 'xpDiffPerMinDeltas',
-                    'xpPerMinDeltas'
+timelineFeatures = ["creepsPerMinDeltas", "csDiffPerMinDeltas", "damageTakenDiffPerMinDeltas",
+                    "damageTakenPerMinDeltas", "goldPerMinDeltas", "xpDiffPerMinDeltas",
+                    "xpPerMinDeltas"
                     ]
 
 # Defining the extractors and normalizers
@@ -197,7 +197,7 @@ for f in spellNameToId:
      featureExtractors[f] = spell_feature_getter(f)
 
 for f in featureExtractors:
-    # If a feature doesn't have a normalizer, jsut use the default
+    # If a feature doesn"t have a normalizer, jsut use the default
     if f not in featureNormalizers:
         featureNormalizers[f] = normalize_feature
 

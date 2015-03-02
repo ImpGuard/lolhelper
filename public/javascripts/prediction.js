@@ -77,9 +77,25 @@ $(function() {
     }*/
 
 
+    function getUrlParameter(param) {
+        var pageURL = window.location.search.substring(1);
+        var urlVariables = pageURL.split("&");
+        for (var i = 0; i < urlVariables.length; i++) {
+            var parameterName = urlVariables[i].split("=");
+            if (parameterName[0] == param)
+                return parameterName[1];
+        }
+    }
+
     function getMatchData(summonerName, callback) {
         $.get("http://localhost:3000/matches/" + summonerName, function(responseText) {
             callback(JSON.parse(responseText));
+        });
+    }
+
+    function getSummonerId(summonerName, callback) {
+        $.get("http://localhost:3000/summonerId/" + summonerName, function(responseText) {
+            callback(responseText);
         });
     }
 
@@ -94,8 +110,8 @@ $(function() {
      * Sends a GET request to the server for a particular classifier, specified by a coefficient
      * vector and an offset value.
      */
-    function getClassifier(name, callback) {
-        $.get("http://localhost:3000/classifier/" + name, function(responseText) {
+    function getClassifier(role, callback) {
+        $.get("http://localhost:3000/classifier/" + role, function(responseText) {
             var data = JSON.parse(responseText);
             if ("coef" in data && "offset" in data) {
                 console.log("SUCCESS!");
@@ -138,4 +154,13 @@ $(function() {
     window.getClassifier = getClassifier;
     window.getMatchData = getMatchData;
     window.getProfilePictureURL = getProfilePictureURL;
+
+    var username = getUrlParameter("username");
+    var role = getUrlParameter("role");
+    getClassifier(role, function(cls) {
+        getMatchData(username, function(matches) {
+            // var featureVectors = featuresFromMatches(matches, username, role);
+            console.log(matches);
+        });
+    });
 });
