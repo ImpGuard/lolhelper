@@ -27,4 +27,15 @@ $(function() {
     };
 
     resizeFakeTitle();
+
+    $(".dial").knob({
+        "min":0,
+        "max":100,
+        "width": 120,
+        "height": 120,
+        "fgColor": "#b9e672",
+        "thickness": 0.2,
+        "angleOffset": -90,
+        "angleArc": 180,
+    });
 });
