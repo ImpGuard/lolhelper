@@ -76,7 +76,7 @@ class MatchDataCollection(object):
         pprint(self.matches[matches.keys()[index]])
 
     # role should be "BOT"/"SUPPORT"/"MID"/"JUNGLE"/"TOP"
-    def featurize(self, role):
+    def featurize(self, role, printLog=False):
         # X is the list of features for a player of the given role and lane
         # For N games, there are at most 2N vectors in X, as there should be at most one player of a role and lane on each team
         # Y is the corresponding labels: wether that player win or lost the game
@@ -91,7 +91,8 @@ class MatchDataCollection(object):
         Y += [0] * losses
 
         for featureName, extractor in featureExtractors.items():
-            print "Extracting feature '%s'" % featureName
+            if printLog:
+                print "Extracting feature '%s'" % featureName
             stats = np.hstack([extractor(self, winner=True, role=role, lane=lane),
                 extractor(self, winner=False, role=role, lane=lane)])
             stats = featureNormalizers[featureName](stats)
@@ -201,7 +202,6 @@ for f in featureExtractors:
         featureNormalizers[f] = normalize_feature
 
 if __name__ == "__main__":
-    with open("challenger_matches.json") as json_file:
-        data = json.load(json_file)
-        m = MatchDataCollection(dict(data.items()[:10]))
-    x, y = m.featurize(role="MID")
+    matchData = MatchDataCollection(load_json_as_object("learn/challenger_matches"))
+    data, labels = matchData.featurize("MID")
+    mean, accuracies = kfcv_accuracy(data, labels)

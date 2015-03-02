@@ -1,4 +1,6 @@
 import json
+import sys
+import time
 import numpy as np
 
 def filename_with_extension(filename, extension):
@@ -58,9 +60,9 @@ Runs the given function, wrapping execution of the function with timing outputs.
 def run_and_time(message, function, messageLimit=70):
     print message, " " * (messageLimit - len(message)),
     sys.stdout.flush()
-    currentTime = time()
+    currentTime = time.time()
     result = function()
-    print "    done. (%.2f seconds)" % (time() - currentTime)
+    print "    done. (%.2f seconds)" % (time.time() - currentTime)
     return result
 
 """
