@@ -1,4 +1,5 @@
 $(function() {
+
     function getMatchData(summonerName, callback) {
         $.get("http://localhost:3000/matches/" + summonerName, function(responseText) {
             callback(JSON.parse(responseText));
@@ -6,8 +7,26 @@ $(function() {
     }
 
     function getProfilePictureURL(summonerName, callback) {
-        $.get("http://localhost:3000/picture/" + summonerName, function(responseText) {
-            callback(JSON.parse(responseText));
+        $.get("http://localhost:3000/icon/" + summonerName, function(responseText) {
+            callback(responseText);
+        });
+    }
+
+    /**
+     * Sends a GET request to the server for a particular classifier, specified by a coefficient
+     * vector and an offset value.
+     */
+    function getClassifier(name, callback) {
+        $.get("http://localhost:3000/classifier/" + name, function(responseText) {
+            var data = JSON.parse(responseText);
+            if ("coef" in data && "offset" in data) {
+                console.log("SUCCESS!");
+                callback(new LogisticClassifier(data["coef"], data["offset"]));
+            } else {
+                console.log("FAILURE. Error: ");
+                console.log(data)
+                callback(null);
+            }
         });
     }
 
@@ -29,24 +48,6 @@ $(function() {
         return res;
     }
 
-    /**
-     * Sends a GET request to the server for a particular classifier, specified by a coefficient
-     * vector and an offset value.
-     */
-    function getClassifier(name, callback) {
-        $.get("http://localhost:3000/classifier/" + name, function(responseText) {
-            var data = JSON.parse(responseText);
-            if ("coef" in data && "offset" in data) {
-                console.log("SUCCESS!");
-                callback(new LogisticClassifier(data["coef"], data["offset"]));
-            } else {
-                console.log("FAILURE. Error: ");
-                console.log(data)
-                callback(null);
-            }
-        });
-    }
-
     function LogisticClassifier(coef, offset) {
         this.coef = coef;
         this.offset = offset;
@@ -57,4 +58,6 @@ $(function() {
     }
 
     window.getClassifier = getClassifier;
+    window.getMatchData = getMatchData;
+    window.getProfilePictureURL = getProfilePictureURL;
 });

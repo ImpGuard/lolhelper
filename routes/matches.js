@@ -3,20 +3,21 @@ var router = express.Router();
 var path = require("path");
 var request = require("request");
 
-API_KEY = "8088e4ce-a8e4-48ea-aec3-c0ac14bfb5a3";
+API_KEY_A = "8088e4ce-a8e4-48ea-aec3-c0ac14bfb5a3";
+API_KEY_B = "e32f393e-c4c1-4214-87ba-866ac3d543e1";
 REGION = "na";
 URL_HOST = "https://" + REGION + ".api.pvp.net";
 
 var requestPathForSummoner = function(summonerName) {
-    return "/api/lol/" + REGION + "/v1.4/summoner/by-name/" + summonerName + "?api_key=" + API_KEY;
+    return "/api/lol/" + REGION + "/v1.4/summoner/by-name/" + summonerName + "?api_key=" + API_KEY_B;
 }
 
 var requestPathForMatchHistory = function(summonerId) {
-    return "/api/lol/" + REGION + "/v2.2/matchhistory/" + summonerId + "?rankedQueues=RANKED_SOLO_5x5&api_key=" + API_KEY;
+    return "/api/lol/" + REGION + "/v2.2/matchhistory/" + summonerId + "?rankedQueues=RANKED_SOLO_5x5&api_key=" + API_KEY_B;
 }
 
 var requestPathForMatchData = function(matchId) {
-    return "/api/lol/" + REGION + "/v2.2/match/" + matchId + "?api_key=" + API_KEY;
+    return "/api/lol/" + REGION + "/v2.2/match/" + matchId + "?api_key=" + API_KEY_A;
 }
 
 var fetchMatchesAndWriteResponse = function(res, matchIds) {

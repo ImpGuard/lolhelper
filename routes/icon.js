@@ -4,7 +4,7 @@ var path = require("path");
 var request = require("request");
 var fs = require("fs");
 
-API_KEY = "8088e4ce-a8e4-48ea-aec3-c0ac14bfb5a3";
+API_KEY_B = "e32f393e-c4c1-4214-87ba-866ac3d543e1";
 REGION = "na";
 URL_HOST = "https://" + REGION + ".api.pvp.net";
 DDRAGON_HOST = "http://ddragon.leagueoflegends.com"
@@ -14,7 +14,7 @@ var requestPathForIcon = function(id) {
 }
 
 var requestPathForSummoner = function(summonerName) {
-    return "/api/lol/" + REGION + "/v1.4/summoner/by-name/" + summonerName + "?api_key=" + API_KEY;
+    return "/api/lol/" + REGION + "/v1.4/summoner/by-name/" + summonerName + "?api_key=" + API_KEY_B;
 }
 
 router.get("/:summonerName", function(req, res) {
