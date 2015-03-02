@@ -1,8 +1,9 @@
 var express = require("express");
-var router = express.Router();
 var path = require("path");
 var request = require("request");
 var fs = require("fs");
+
+var router = express.Router();
 
 API_KEY_B = "e32f393e-c4c1-4214-87ba-866ac3d543e1";
 REGION = "na";
