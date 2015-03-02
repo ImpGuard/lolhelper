@@ -14,7 +14,7 @@ $(function() {
             var pids = match["participantIdentities"]
             var pid;
             pids.forEach(function(participantIdentity) {
-                if (participantIdentity.player["summonerName"] == userName) {
+                if (participantIdentity["player"]["summonerName"].toLowerCase() == userName.toLowerCase()) {
                     pid = participantIdentity["participantId"];
                 }
             });
@@ -67,7 +67,7 @@ $(function() {
 
     function featuresFromMatches(matches, username, role) {
         var featureVectors = [];
-        var laneAndRole = roleToLaneAndRole[role];
+        var laneAndRole = roleToLaneAndRole[role.toUpperCase()];
         statsFeatures.forEach(function(featureName) {
             sum = 0.0;
             featureValues = dataPerParticipant(matches, username, "stats/" + featureName, laneAndRole[1], laneAndRole[0]);
@@ -80,12 +80,13 @@ $(function() {
             featureVectors.push(sum);
         });
 
-        var timelines = timelines = ["tenToTwenty", "thirtyToEnd", "twentyToThirty", "zeroToTen"];
+        var timelines = ["tenToTwenty", "thirtyToEnd", "twentyToThirty", "zeroToTen"];
         timelineFeatures.forEach(function(featureName) {
             timelines.forEach(function(timeline) {
                 sum = 0.0;
                 featureValues = dataPerParticipant(matches, username, "timeline/" + featureName + "/" + timeline, laneAndRole[1], laneAndRole[0]);
                 featureValues.forEach(function(data) {
+
                     if (typeof data === "boolean")
                         data = (data ? 1.0 : 0.0)
                     sum += 1.0 * data;
@@ -163,7 +164,7 @@ $(function() {
     }
 
     function sigma(x) {
-        return 1 / (1 + exp(-x));
+        return 1 / (1 + Math.exp(-x));
     }
 
     /**
@@ -172,7 +173,7 @@ $(function() {
      * lengths.
      */
     function dot(u, v) {
-        var k = min(u.length, v.length);
+        var k = Math.min(u.length, v.length);
         var res = 0;
         for (var i = 0; i < k; i++) {
             res += u[i] * v[i];
@@ -189,13 +190,13 @@ $(function() {
     }
 
     LogisticClassifier.prototype.predict = function(x) {
-        x = x.map(function(element, index) { return element / this.maxima[index]; })
-        return sigma(dot(x, this.coef) + this.offset);
+        var maxima = this.maxima;
+        return sigma(dot(x.map(function(element, index) { return maxima[index] == 0 ? 0 : element / maxima[index]; }), this.coef) + this.offset);
     }
 
     window.getClassifier = getClassifier;
     window.getMatchData = getMatchData;
     window.getProfilePictureURL = getProfilePictureURL;
     window.dataPerParticipant = dataPerParticipant;
-
+    window.featuresFromMatches = featuresFromMatches;
 });

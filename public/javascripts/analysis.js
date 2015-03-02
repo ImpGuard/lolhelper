@@ -140,12 +140,14 @@ $(function() {
 
         getMatchData(username, function(_matchData) {
             matchData = _matchData
-            // var features = featuresFromMatches(matchData, username, role);
-
+            features = featuresFromMatches(matchData, username, role).map(function(e) {
+                return isNaN(e) ? 0 : e;
+            });
             getClassifier(role, function(classifier) {
 
-                // var percent = classifier.predict(features);
-                // dial.animate(percent);
+                var percent = classifier.predict(features);
+                dial.animate(percent);
+                console.log(percent);
                 // generateModules(classifier, matchData);
             });
         });
