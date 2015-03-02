@@ -82,17 +82,19 @@ class MatchDataCollection(object):
         # Y is the corresponding labels: wether that player win or lost the game 
         X = []
         Y = []
+        
+        # Break up the role into role and land that are required for accessing match data.
+        lane, role = roleToLaneAndRole[role]
 
         wins, losses = self.win_loss(lane=lane, role=role)
         Y += [1] * wins
         Y += [0] * losses
 
-        # Break up the role into role and land that are required for accessing match data.
-        lane, role = roleToLaneAndRole[role]
         for featureName, extractor in featureExtractors.items():
+            print "Extracting feature '%s'" % featureName
             stats = np.hstack([extractor(self, winner=True, role=role, lane=lane), 
                 extractor(self, winner=False, role=role, lane=lane)])
-            stats = featureNormalizers[featureName]
+            stats = featureNormalizers[featureName](stats)
             X.append(stats)
 
         X = np.array(X, dtype=np.float32)
@@ -109,14 +111,102 @@ featureExtractors = {}
 # feature, and then return the normalized values.
 featureNormalizers = {}
 
+# Normalize a vector to have values between 0 and 1.
+def normalize_feature(v):
+    # No need to normalize if everything is already between 0 and 1 (for bool) or all 0's (for max = 0)
+    if type(v[0]) == bool or max(v) == 0:
+        return v
+    else:
+        return np.array(v, dtype=np.float32) / max(v)
+
+def stats_data_getter(name):
+    keyPath = "stats/" + name
+    def foo(m, winner, role, lane):
+        return m.data_per_participant(keyPath, winner=winner, role=role, lane=lane)
+    return foo
+
+def timeline_data_getter(name, timeline):
+    keyPath = "timeline/%s/%s" % (name, timeline)
+    def foo(m, winner, role, lane):
+        return m.data_per_participant(keyPath, winner=winner, role=role, lane=lane)
+    return foo
+
+statsFeatures = ['assists', 'champLevel', 'deaths', 'doubleKills', 
+                'firstBloodAssist', 'firstBloodKill', 'firstInhibitorAssist', 'firstInhibitorKill', 
+                'firstTowerAssist', 'firstTowerKill', 'goldEarned', 'goldSpent', 'inhibitorKills', 
+                #'item0', 'item1', 'item2', 'item3', 'item4', 'item5', 'item6', 
+                'killingSprees', 'kills',
+                'largestCriticalStrike', 'largestKillingSpree', 'largestMultiKill', 'magicDamageDealt',
+                'magicDamageDealtToChampions', 'magicDamageTaken', 'minionsKilled', 
+                'neutralMinionsKilled', 'neutralMinionsKilledEnemyJungle', 
+                'neutralMinionsKilledTeamJungle', 'pentaKills', 
+                'physicalDamageDealt', 'physicalDamageDealtToChampions', 'physicalDamageTaken', 
+                'quadraKills', 'sightWardsBoughtInGame', 'totalDamageDealt', 
+                'totalDamageDealtToChampions', 'totalDamageTaken', 'totalHeal', 
+                'totalTimeCrowdControlDealt', 'totalUnitsHealed', 'towerKills', 
+                'tripleKills', 'trueDamageDealt', 'trueDamageDealtToChampions', 'trueDamageTaken', 
+                'unrealKills', 'visionWardsBoughtInGame', 'wardsKilled', 'wardsPlaced'
+                ]
+
+timelineFeatures = ['creepsPerMinDeltas', 'csDiffPerMinDeltas', 'damageTakenDiffPerMinDeltas', 
+                    'damageTakenPerMinDeltas', 'goldPerMinDeltas', 'xpDiffPerMinDeltas',
+                    'xpPerMinDeltas'
+                    ]
+
+# Defining the extractors and normalizers
+for f in statsFeatures:
+    featureExtractors[f] = stats_data_getter(f)
+
+timelines = ["tenToTwenty", "thirtyToEnd", "twentyToThirty", "zeroToTen"]
+for f in timelineFeatures:
+    for timeline in timelines:
+        featureExtractors[f + "_" + timeline] = timeline_data_getter(f, timeline)
+
+# Misc. features
+spellNameToId = {
+                    "spell_cleanse" : 1,
+                    "spell_clairv"  : 2,
+                    "spell_exhaust" : 3,
+                    "spell_flash"   : 4,
+                    "spell_ghost"   : 6,
+                    "spell_heal"    : 7,
+                    "spell_revive"  : 10,
+                    "spell_smite"   : 11,
+                    "spell_teleport": 12,
+                    "spell_clarity" : 13,
+                    "spell_ignite"  : 14,
+                    "spell_garrison": 17,
+                    "spell_barrier" : 21 
+                }
+def spell_feature_getter(spellName):
+    def foo(m, winner, role, lane):
+        spell1s = m.data_per_participant("spell1Id", winner=winner, role=role, lane=lane)
+        spell2s = m.data_per_participant("spell2Id", winner=winner, role=role, lane=lane)
+        spellId = spellNameToId[spellName]
+
+        x = []
+        for i in xrange(len(spell1s)):
+            if spell1s[i] == spellId or spell2s[i] == spellId:
+                x.append(True)
+            else:
+                x.append(False)
+        return np.array(x)
+    return foo
+for f in spellNameToId:
+     featureExtractors[f] = spell_feature_getter(f)
+
+for f in featureExtractors:
+    # If a feature doesn't have a normalizer, jsut use the default
+    if f not in featureNormalizers:
+        featureNormalizers[f] = normalize_feature
 
 if __name__ == "__main__":
-    startTime = time.time()
-    print "Reading matches data..."
-    with open("challenger_matches.json") as json_file:
-        data = json.load(json_file)
-        m = MatchDataCollection(data)
-        print "    Took %.2f second" % (time.time() - startTime)
-
+    # startTime = time.time()
+    # print "Reading matches data..."
+    # with open("challenger_matches.json") as json_file:
+    #     data = json.load(json_file)
+    #     m = MatchDataCollection(dict(data.items()[:10]))
+    #     print "    Took %.2f second" % (time.time() - startTime)
+    # x, y = m.featurize(role="MID")
 
 
