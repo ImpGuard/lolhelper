@@ -24,17 +24,21 @@ $(function() {
                 if (p["participantId"] == pid)
                     user = p;
             });
+
             data.push(dataAtKeypath(user, keyPath));
         });
         return data;
     }
 
     function dataAtKeypath(data, keyPath) {
-        keyPath.forEach(function(key) {
+        for (var i = 0; i < keyPath.length; i++) {
+            key = keyPath[i];
             if (!(key in data))
                 return 0.0;
+
             data = data[key];
-        });
+        }
+
         return data;
     }
 
@@ -84,9 +88,9 @@ $(function() {
         timelineFeatures.forEach(function(featureName) {
             timelines.forEach(function(timeline) {
                 sum = 0.0;
+
                 featureValues = dataPerParticipant(matches, username, "timeline/" + featureName + "/" + timeline, laneAndRole[1], laneAndRole[0]);
                 featureValues.forEach(function(data) {
-
                     if (typeof data === "boolean")
                         data = (data ? 1.0 : 0.0)
                     sum += 1.0 * data;
@@ -106,11 +110,6 @@ $(function() {
                 if (spell1[i] == spellId || spell2[i] == spellId)
                     sum += 1.0
             }
-            featureValues.forEach(function(data) {
-                if (typeof data === "boolean")
-                    data = (data ? 1.0 : 0.0)
-                sum += 1.0 * data;
-            });
             sum /= spell1.length;
             featureVectors.push(sum);
         });
