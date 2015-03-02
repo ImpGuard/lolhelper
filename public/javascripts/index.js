@@ -13,15 +13,16 @@ $(function() {
         window.location = url + "?" + $.param({role: role, region: region, username: username});
     }
     $searchBtn.click(navigateToAnalysis);
-     $(window).bind("keypress", function(e) {
+
+    $(window).bind("keypress", function(e) {
         if (e.keyCode == 13) {
             navigateToAnalysis();
         }
-     });
+    });
 
     $regionGrp.add($roleGrp).find("li a").click(function() {
-        $this = $(this)
+        $this = $(this);
         var selection = $this.text();
-        $this.closest(".btn-group").find("button .value").html(selection)
+        $this.closest(".btn-group").find("button .value").html(selection);
     });
 });

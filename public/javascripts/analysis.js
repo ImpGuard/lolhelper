@@ -3,6 +3,7 @@ $(function() {
     var $fakeTitle = $(".fake-title");
     var $dial = $title.find(".dial");
     var $content = $("#content");
+    var dial;
 
     //------------------------------------------------------------
     // Create main dial
@@ -28,8 +29,7 @@ $(function() {
         return progressBar;
     }
 
-    var dial = createDial();
-    dial.animate(0.7);
+    dial = createDial();
 
     //------------------------------------------------------------
     // Resizing the fake title
@@ -38,8 +38,6 @@ $(function() {
     var resizeFakeTitle = function() {
         $fakeTitle.height($title.outerHeight());
     };
-
-    resizeFakeTitle();
 
     //------------------------------------------------------------
     // Knob code
@@ -62,6 +60,16 @@ $(function() {
         });
     }
 
+    /**
+     * Knobs is a list of "specifications" that will be used to build each knob.
+     * Each specification is a dictionary containing:
+     *
+     * min      - min width
+     * max      - max width
+     * initial  - initial value
+     * text     - title
+     * change   - a function that will be called when the knob's value changes
+     */
     var createModule = function(knobs) {
         var $module = $("<div />").addClass("row module");
         var numOfKnobs = knobs.length
@@ -76,11 +84,11 @@ $(function() {
             // HACKHACK, assumes number of knobs is a factor of 12
             var columnSize = 12 / numOfKnobs;
 
-            var $element = $("<div />").addClass("col-md-" + columnSize);
+            var $element = $("<div />").addClass("col-md-" + columnSize).addClass("module-column");
             var $knob = $("<input />").addClass("knob").attr("value", initial)
             var $text = $("<div />").addClass("text").text(text).css({
-                position: "absolute",
                 width: KNOB_WIDTH,
+                position: "absolute",
                 top: KNOB_WIDTH / 2 + 30,
                 textAlign: "center"
             });
@@ -96,51 +104,52 @@ $(function() {
         $content.append($module)
     };
 
-    createModule([
-        {
-            initial: 0,
-            min: 0,
-            max: 100,
-            text: "Gold",
-            change: function(v) { console.log(v) }
-        },
-        {
-            initial: 0,
-            min: 0,
-            max: 100,
-            text: "Creep Score",
-            change: function(v) { console.log(v) }
-        },
-        {
-            initial: 0,
-            min: 0,
-            max: 100,
-            text: "Your age",
-            change: function(v) { console.log(v) }
-        }
-    ])
-    createModule([
-        {
-            initial: 0,
-            min: 0,
-            max: 100,
-            text: "Gold",
-            change: function(v) { console.log(v) }
-        },
-        {
-            initial: 0,
-            min: 0,
-            max: 100,
-            text: "Creep Score",
-            change: function(v) { console.log(v) }
-        },
-        {
-            initial: 0,
-            min: 0,
-            max: 100,
-            text: "Your age",
-            change: function(v) { console.log(v) }
-        }
-    ])
+    //------------------------------------------------------------
+    // Entry point
+    //------------------------------------------------------------    
 
+    var queryDict = {};
+    window.location.search.substr(1).split("&").forEach(function(item) {
+        keyAndParam = item.split("=");
+        queryDict[keyAndParam[0]] = keyAndParam[1];
+    });
+
+    var generateModules = function(classifier, features) {
+        var module1 = [
+            {
+                min: 0,
+                max: 100,
+                initial: 0,
+                title: "hi",
+                change: function(val) {
+                    // Update features
+                    var percent = classifier.predict(features);
+                    dial.animate(percent);
+                }
+            }
+        ]
+
+        createModule(module1);
+    };
+
+    var start = function() {
+        var username = queryDict["username"];
+        var role = queryDict["role"];
+        var region = queryDict["region"];
+
+        getMatchData(username, function(matchData) {
+            // var features = featuresFromMatches(matchData, username, role);
+
+            getClassifier(role, function(classifier) {
+                // var percent = classifier.predict(features);
+
+                // dial.animate(percent);
+
+
+
+            })
+        });
+    };
+
+    start();
 });
