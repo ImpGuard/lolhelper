@@ -65,18 +65,56 @@ $(function() {
         "spell_barrier" : 21
     };
 
-    // function featuresFromMatches(matches, username, role) {
-    //     var featureVectors = [];
-    //     var laneAndRole = roleToLaneAndRole[role]
-    //     statsFeatures.forEach(function(featureName) {
-    //         featureValues = []
-    //         dataPerParticipant(matches, username, "stats/" + featureName, laneAndRole[1], laneAndRole[0]).forEach(function(data) {
+    function featuresFromMatches(matches, username, role) {
+        var featureVectors = [];
+        var laneAndRole = roleToLaneAndRole[role];
+        statsFeatures.forEach(function(featureName) {
+            sum = 0.0;
+            featureValues = dataPerParticipant(matches, username, "stats/" + featureName, laneAndRole[1], laneAndRole[0]);
+            featureValues.forEach(function(data) {
+                if (typeof data === "boolean")
+                    data = (data ? 1.0 : 0.0)
+                sum += 1.0 * data;
+            });
+            sum /= featureValues.length;
+            featureVectors.push(sum);
+        });
 
-    //             featureVectors.push(data);
-    //         });
-    //     });
-    //     dataPerParticipant()
-    // }
+        var timelines = timelines = ["tenToTwenty", "thirtyToEnd", "twentyToThirty", "zeroToTen"];
+        timelineFeatures.forEach(function(featureName) {
+            timelines.forEach(function(timeline) {
+                sum = 0.0;
+                featureValues = dataPerParticipant(matches, username, "timeline/" + featureName + "/" + timeline, laneAndRole[1], laneAndRole[0]);
+                featureValues.forEach(function(data) {
+                    if (typeof data === "boolean")
+                        data = (data ? 1.0 : 0.0)
+                    sum += 1.0 * data;
+                });
+                sum /= featureValues.length;
+                featureVectors.push(sum);
+            });
+        });
+        var spellNames = Object.keys(spellNameToId);
+        spellNames.sort();
+        spellNames.forEach(function(spellName) {
+            sum = 0.0;
+            spell1 = dataPerParticipant(matches, username, "spell1Id", laneAndRole[1], laneAndRole[0]);
+            spell2 = dataPerParticipant(matches, username, "spell2Id", laneAndRole[1], laneAndRole[0]);
+            spellId = spellNameToId[spellName];
+            for (var i = 0; i < spell1.length; i++) {
+                if (spell1[i] == spellId || spell2[i] == spellId)
+                    sum += 1.0
+            }
+            featureValues.forEach(function(data) {
+                if (typeof data === "boolean")
+                    data = (data ? 1.0 : 0.0)
+                sum += 1.0 * data;
+            });
+            sum /= spell1.length;
+            featureVectors.push(sum);
+        });
+        return featureVectors;
+    }
 
     function getUrlParameter(param) {
         var pageURL = window.location.search.substring(1);
@@ -162,13 +200,4 @@ $(function() {
     window.getProfilePictureURL = getProfilePictureURL;
     window.dataPerParticipant = dataPerParticipant;
 
-    var username = getUrlParameter("username");
-    var role = getUrlParameter("role");
-    getClassifier(role, function(cls) {
-        getMatchData(username, function(m) {
-            // var featureVectors = featuresFromMatches(matches, username, role);
-            matches = m;
-            classifier = cls;
-        });
-    });
 });
