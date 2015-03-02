@@ -8,26 +8,48 @@ block extraHead
   script(type="application/javascript", src="/javascripts/prediction.js")
 
 block content
-  .title.container-fluid
-    .row-fluid
+  //- nav#main-nav.navbar.navbar-default.navbar-fixed-top
+  //-   .container-fluid
+  //-     .navbar-header
+  //-       button.navbar-toggle.collapsed(type="button", data-toggle="collapse", data-target="#bs-navbar-collapse")
+  //-         .sr-only Toggle navigation
+  //-         .icon-bar
+  //-         .icon-bar
+  //-         .icon-bar
+  //-     #bs-navbar-collapse.collapse.navbar-collapse
+  //-       form.navbar-form.navbar-right(role="search")
+  //-         .form-group
+  //-           input.username.form-control(type="text")
+  //-         .btn-group.region(role="group")
+  //-           button.btn.btn-default.dropdown-toggle(type="button", data-toggle="dropdown") #[span.value NA] #[span.caret]
+  //-           ul.dropdown-menu.dropdown-menu-right(role="menu")
+  //-             li #[a(role="button") NA]
+  //-             li #[a(role="button") KR]
+  //-         .btn-group.role(role="group")
+  //-           button.btn.btn-default.dropdown-toggle(type="button", data-toggle="dropdown") #[span.value Role] #[span.caret]
+  //-           ul.dropdown-menu.dropdown-menu-left(role="menu")
+  //-             li #[a(role="button") Top]
+  //-             li #[a(role="button") Mid]
+  //-             li #[a(role="button") Jungle]
+  //-             li #[a(role="button") Carry]
+  //-             li #[a(role="button") Support]
+  //-         button.btn.btn-primary.search(type="button") Search 
+
+  #title.container-fluid.text-center
+    .row
       .col-md-offset-3.col-md-6.username
         h1= username
-    .row-fluid
+    .row
       .col-md-offset-3.col-md-6
         .curr-rank Bronze
         .separator &nbsp;&rarr;&nbsp;
         .next-rank Challenger
-    .row-fluid.margin-top-8
+    .row.margin-top-1
       .col-md-offset-5.col-md-2
-        input.dial(value="75")
+        .dial
 
   .fake-title
-  .container-fluid
-    .row-fluid
-      .module.col-md-4
-        p Hi
-      .module.col-md-4
-        p Hi
-      .module.col-md-4
-        p Hi
-
+  #content.container-fluid
+    .row
+      .col-md-offset-3.col-md-6.text-center
+        h2 Predictors

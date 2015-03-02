@@ -2,11 +2,12 @@
 // Title Div
 //------------------------------------------------------------
 
-.title {
+#title {
     width: 100%;
     padding-bottom: 20px;
+    background-color: white;
     position: fixed;
-    text-align: center;
+    z-index: 1;
 
     .curr-rank, .separator, .next-rank {
         display: inline-block;
@@ -19,6 +20,30 @@
         svg {
             display: block;
             width: 100%;
+        }
+
+        .progressbar-text {
+            font-size: 24px;
+            font-weight: 300;
+
+            &:after {
+                content: "chance to win";
+                display: block;
+                color: #aaaaaa;
+                font-size: 12px;
+            }
+        }
+    }
+}
+
+#content { 
+    .module {
+
+        margin-top: 2em;
+
+        .col-md-4 div {
+            display: block !important;
+            margin: 0 auto;
         }
     }
 }
