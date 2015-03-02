@@ -1,30 +1,33 @@
 extends layout
 
+block extraHead
+  script(type="application/javascript", src="javascripts/index.js")
+
 block content
   .jumbotron
     .container-fluid
       .row-fluid
         .col-md-12
-          h1.text-center A League of Legends Helper
+          h1.text-center So you want to be Challenger?
       .row-fluid.margin-top-md
         .col-md-3
         .col-md-6
           .input-group
-            input.form-control(type="text")
+            input.username.form-control(type="text")
             .input-group-btn
-              .btn-group
-                button.btn.btn-default.dropdown-toggle(type="button", data-toggle="dropdown") Region #[span.caret]
+              .btn-group.region(role="group")
+                button.btn.btn-default.dropdown-toggle(type="button", data-toggle="dropdown") #[span.value NA] #[span.caret]
                 ul.dropdown-menu.dropdown-menu-right(role="menu")
-                  li #[a(href="#") NA]
-                  li #[a(href="#") KR]
-              .btn-group
-                button.btn.btn-default.dropdown-toggle(type="button", data-toggle="dropdown") Role #[span.caret]
-                ul.dropdown-menu.dropdown-menu-right(role="menu")
-                  li #[a(href="#") Top]
-                  li #[a(href="#") Mid]
-                  li #[a(href="#") Jungle]
-                  li #[a(href="#") Carry]
-                  li #[a(href="#") Support]
-              button.btn.btn-primary.search(type="button") Search
+                  li #[a(role="button") NA]
+                  li #[a(role="button") KR]
+              .btn-group.role(role="group")
+                button.btn.btn-default.dropdown-toggle(type="button", data-toggle="dropdown") #[span.value Role] #[span.caret]
+                ul.dropdown-menu.dropdown-menu-left(role="menu")
+                  li #[a(role="button") Top]
+                  li #[a(role="button") Mid]
+                  li #[a(role="button") Jungle]
+                  li #[a(role="button") Carry]
+                  li #[a(role="button") Support]
+              button.btn.btn-primary.search(type="button") Search 
         .col-md-3
 

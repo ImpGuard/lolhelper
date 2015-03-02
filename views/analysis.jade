@@ -1,0 +1,15 @@
+extends layout
+
+block extraHead
+  link(rel="stylesheet", type="text/css", href="stylesheets/analysis.css")
+  script(type="application/javascript", src="javascripts/progressbar.min.js")
+  script(type="application/javascript", src="javascripts/jquery.knob.min.js")
+
+block content
+  .title
+    .profile
+      .img
+      .name= username
+      .current-rank Bronze
+      .desired-rank Challenger
+    .dial
