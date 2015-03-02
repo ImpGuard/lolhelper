@@ -106,7 +106,7 @@ $(function() {
 
     //------------------------------------------------------------
     // Entry point
-    //------------------------------------------------------------    
+    //------------------------------------------------------------
 
     var queryDict = {};
     window.location.search.substr(1).split("&").forEach(function(item) {
@@ -114,7 +114,7 @@ $(function() {
         queryDict[keyAndParam[0]] = keyAndParam[1];
     });
 
-    var generateModules = function(classifier, features) {
+    var generateModules = function(classifier, matchData) {
         var module1 = [
             {
                 min: 0,
@@ -122,7 +122,8 @@ $(function() {
                 initial: 0,
                 title: "hi",
                 change: function(val) {
-                    // Update features
+                    // Mutate matchData
+                    // var features = featuresFromMatches(matchData, username, role);
                     var percent = classifier.predict(features);
                     dial.animate(percent);
                 }
@@ -133,21 +134,20 @@ $(function() {
     };
 
     var start = function() {
-        var username = queryDict["username"];
-        var role = queryDict["role"];
+        username = queryDict["username"];
+        role = queryDict["role"];
         var region = queryDict["region"];
 
-        getMatchData(username, function(matchData) {
+        getMatchData(username, function(_matchData) {
+            matchData = _matchData
             // var features = featuresFromMatches(matchData, username, role);
 
             getClassifier(role, function(classifier) {
+
                 // var percent = classifier.predict(features);
-
                 // dial.animate(percent);
-
-
-
-            })
+                // generateModules(classifier, matchData);
+            });
         });
     };
 

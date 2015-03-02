@@ -154,11 +154,9 @@ $(function() {
             var data = JSON.parse(responseText);
             if ("coef" in data && "offset" in data) {
                 console.log("SUCCESS!");
-                console.log(data)
                 callback(new LogisticClassifier(data["coef"], data["offset"], data["maxima"]));
             } else {
                 console.log("FAILURE. Error: ");
-                console.log(data)
                 callback(null);
             }
         });
