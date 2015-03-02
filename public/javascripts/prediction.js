@@ -116,7 +116,8 @@ $(function() {
             var data = JSON.parse(responseText);
             if ("coef" in data && "offset" in data) {
                 console.log("SUCCESS!");
-                callback(new LogisticClassifier(data["coef"], data["offset"]));
+                console.log(data)
+                callback(new LogisticClassifier(data["coef"], data["offset"], data["maxima"]));
             } else {
                 console.log("FAILURE. Error: ");
                 console.log(data)
@@ -164,9 +165,10 @@ $(function() {
     var username = getUrlParameter("username");
     var role = getUrlParameter("role");
     getClassifier(role, function(cls) {
-        getMatchData(username, function(matches_) {
+        getMatchData(username, function(m) {
             // var featureVectors = featuresFromMatches(matches, username, role);
-            matches = matches_;
+            matches = m;
+            classifier = cls;
         });
     });
 });
